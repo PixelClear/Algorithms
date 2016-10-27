@@ -60,6 +60,32 @@ int _atoi(char c[])
 	return (sign*n);
 }
 
+double atof(char s[])
+{
+  int i = 0;
+  int sign = 0;
+  double val = 0.0;
+  double pow = 0.0;
+
+  for(i = 0; i < isspace(s[i]); i++);
+  sign = (s[i] == '-') ? -1 : 1;
+  if(s[i] == '+' || s[i] == '-')
+      i++;
+
+  for(val = 0.0 ; isdigit(s[i]);i++)
+	  val = 10.0 * val + s[i] -'0';
+  if(s[i] == '.')
+	  i++;
+  for(pow = 1.0 ; isdigit(s[i]); i++)
+  {
+	  val = 10.0 * val + s[i] - '0';
+	  pow = pow * 10.0;
+  }
+
+  return sign*(val/pow);
+}
+
+
 int main()
 {
 	char c[] = "-128";
