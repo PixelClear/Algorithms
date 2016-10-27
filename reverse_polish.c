@@ -62,12 +62,16 @@ int getline(char s[], int lim)
 
 }
 
+//Scientific notation for float point
+#include<math.h>
+
 double atof(char s[])
 {
   int i = 0;
   int sign = 0;
   double val = 0.0;
-  double pow = 0.0;
+  double powr = 0.0;
+  double result ;
 
   for(i = 0; i < isspace(s[i]); i++);
   sign = (s[i] == '-') ? -1 : 1;
@@ -78,15 +82,31 @@ double atof(char s[])
 	  val = 10.0 * val + s[i] -'0';
   if(s[i] == '.')
 	  i++;
-  for(pow = 1.0 ; isdigit(s[i]); i++)
+  for(powr = 1.0 ; isdigit(s[i]); i++)
   {
 	  val = 10.0 * val + s[i] - '0';
-	  pow = pow * 10.0;
+	  powr = powr * 10.0;
   }
 
-  return sign*(val/pow);
-}
+  if(s[i] == 'e' || s[i] == 'E')
+  {
+	  double temp_pow ;
+	  int temp_sign ;
+	  double test;
+	  
+	  i++;
+	  temp_sign = (s[i] == '-') ? -1 : 1;
+	  if(s[i] == '+' || s[i] == '-')
+		  i++;
+	  for(temp_pow = 0.0 ; isdigit(s[i]);i++)
+		  temp_pow = 10.0 * temp_pow + s[i] -'0';
 
+	  result = (val/powr);
+	  result *= powf(10.0, (temp_sign * temp_pow));
+	  
+  }
+  return sign*result;
+}
 #define STACKLIMIT 100
 int sp = 0;
 double stack[STACKLIMIT];
