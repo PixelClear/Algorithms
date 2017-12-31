@@ -1,0 +1,65 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <map>
+
+using std::vector;
+using std::pair;
+vector<bool> visited;
+vector<bool> recstack;
+
+/*
+ When ever new elements come we put it on current stack element.
+ Then exploring it we check if we encounter the same element before.
+ Else after explore we are done so remove it from list.
+ */
+static int clocks = 0;
+bool DFS(vector<vector<int> > &adj, int x)
+{
+    vector<int>::iterator it;
+    visited[x] = true;
+    recstack[x] = true; // currently processing element
+  
+    for(it = adj[x].begin(); it < adj[x].end(); it++)
+        if(visited[*it] == false && DFS(adj, *it))
+           return true;
+        else if(recstack[*it] == true)
+            return true;
+
+    recstack[x] = false; // done processing
+  
+    return false;
+}
+
+int acyclic(vector<vector<int> > &adj) {
+
+    for(int i = 0; i < adj.size(); i++)
+    {
+        if(visited[i] == false)
+            if(DFS(adj, i))
+                std::cout << "Cycle";
+            else
+                std::cout << "Nocycle";
+    }
+  
+
+    return 0;
+}
+
+int main() {
+    size_t n, m;
+    std::cin >> n >> m;
+    vector<vector<int> > adj(n, vector<int>());
+    visited.reserve(m);
+    recstack.reserve(m);
+    for (size_t i = 0; i < m; i++) {
+        int x, y;
+        std::cin >> x >> y;
+        adj[x - 1].push_back(y - 1);
+        postorders[i] = 0;
+        preorders[i] = 0;
+        visited[i] = false;
+        recstack[i] = false;
+    }
+    std::cout << acyclic(adj);
+}

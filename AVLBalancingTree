@@ -1,0 +1,192 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+
+typedef struct tree{
+    int data;
+    struct tree* right;
+    struct tree* left;
+    int height;
+}Tree;
+
+int max(int a, int b)
+{
+    return (a>b)? a : b;
+}
+
+Tree* getNode(int data)
+{
+    Tree* node = (Tree*)malloc(sizeof(Tree));
+    if(node != NULL)
+    {
+        node->data = data;
+        node->right = NULL;
+        node->left = NULL;
+        node->height = -1;
+    }
+
+    return node;
+}
+
+int height(Tree* node)
+{
+  return (node != NULL)? node->height : -1;
+}
+
+void rotateWithLeftChild(Tree** k2)
+{
+    Tree* k1 = (*k2)->left;
+    (*k2)->left = k1->right;
+    k1->right = (*k2);
+    (*k2)->height = max(height((*k2)->left), height((*k2)->right)) +1;
+    k1->height = max(height(k1->left), (*k2)->height) + 1;
+    (*k2)= k1;
+
+}
+
+void rotateWithRightChild(Tree** k2)
+{
+    Tree* k1 = (*k2)->right;
+    (*k2)->right = k1->left;
+    k1->left = (*k2);
+    (*k2)->height = max(height((*k2)->left), height((*k2)->right)) +1;
+    k1->height = max(height(k1->left), (*k2)->height) + 1;
+    (*k2)= k1;
+
+}
+
+void doubleRotateWithRightChild(Tree** node)
+{
+  rotateWithLeftChild(&((*node)->right));
+  rotateWithRightChild(&(*node));
+}
+
+void doubleRotateWithLeftChild(Tree** node)
+{
+  rotateWithRightChild(&((*node)->left));
+  rotateWithLeftChild(&(*node));
+}
+
+void balance(Tree* node)
+{
+
+    if(node == NULL)
+        return;
+
+    if(height(node->left) - height(node->right) > 1) //Need Balancing in left subtree
+       if(height(node->left->left) > height(node->left->right)) //Need balancing for left child of left subtree
+          rotateWithLeftChild(&node);
+       else
+          doubleRotateWithLeftChild(&node); // right child of left subtree
+    else if(height(node->right) - height(node->left) > 1) //Need balancing in right subtree
+       if(height(node->right->right) > height(node->right->left)) //Need balancing of right child of right subtree
+          rotateWithRightChild(&node);
+       else
+          doubleRotateWithRightChild(&node); //Left child of right subtree
+
+    node->height = max(height(node->left), height(node->right)) +1;
+
+}
+
+void insert(Tree* node, int data)
+{
+    if(node == NULL)
+    {
+        node = getNode(data);
+    }
+
+    if(data < node->data) {
+        insert(node->left, data);
+    }
+    else if(data > node->data)
+        insert(node->right, data);
+
+    balance(node);
+}
+
+int search(Tree* node, int data)
+{
+    if(node->data == data)
+    {
+        return data;
+    }
+
+    if(data < node->data)
+    {
+        return search(node->left, data);
+    }
+    else if(data > node->data)
+    {
+        return search(node->right, data);
+    }
+
+    return 0;
+}
+
+Tree* findMin(Tree* node)
+{
+    if(node == NULL)
+        return NULL;
+
+    if(node->left == NULL)
+    {
+        return node;
+    }
+
+    return findMin(node->left);
+}
+
+
+Tree* findMax(Tree* node)
+{
+    if(node == NULL)
+        return NULL;
+
+    if(node->right == NULL)
+    {
+        return node;
+    }
+
+    return findMax(node->right);
+}
+
+/*
+ * Tree deletion is the hardest case of all.
+ * Once we have found the node to delete we will consider following cases
+ * I. Node is leaf node . We can delete the node immediately
+ * II. Node has one child then we must adjust child link to parent of node
+ * III. Node has two children - Replace data of node to be deleted with smallest node in right
+ * subtree and then delete that smallest node. As smallest node in right subtree cant have left child
+ * so removal is just case II
+ * */
+
+void remove(Tree* node, int data)
+{
+   if(node == NULL)
+       return;
+
+   if(data < node->data)
+       remove(node->left, data);
+   else if(data > node->data)
+       remove(node->right, data);
+   else if(node->left != NULL && node->right != NULL) //Two child node case III
+   {
+      node->data = findMin(node->right)->data;
+      remove(node->right, node->data);
+
+   }
+   else //Case I & II
+   {
+       Tree* oldnode = node;
+       node = (node->right != NULL) ? node->right : node->left;
+       delete oldnode;
+   }
+
+   balance(node);
+}
+
+int main()
+{
+    Tree* root = NULL;
+
+}

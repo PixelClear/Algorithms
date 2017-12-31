@@ -1,0 +1,113 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define FALSE 0
+#define TRUE 1
+#define ALPHABETS 26
+#define CHAR_TO_INDEX(c) ((int)c - (int)'a')
+
+typedef struct TrieNode
+{
+    int isEndOfWord;
+    int isAlreadyFound;
+    struct TrieNode * child[ALPHABETS];
+}Trie;
+
+
+Trie* getNode()
+{
+    Trie* node = (Trie*) malloc (sizeof(Trie));
+    if(node != NULL)
+    {
+        int i;
+        node->isEndOfWord = FALSE;
+        node->isAlreadyFound = FALSE;
+        for(i = 0 ; i < ALPHABETS; i++)
+            node->child[i] = NULL;
+    }
+
+    return node;
+}
+
+void insert(Trie* root, char* key)
+{
+    int len = strlen(key);
+    int i = 0;
+    Trie* node = root;
+    for(i = 0 ; i < len; i++) {
+        int index = CHAR_TO_INDEX(key[i]);
+
+        if(node->child[index] == NULL)
+           node->child[index] = getNode();
+
+        node = node->child[index];
+    }
+
+   node->isEndOfWord = TRUE;
+}
+
+static int numOfPattern = 0;
+
+void prefixTrieMatching(Trie* root, char* text)
+{
+    int i = 0;
+    int len = strlen(text);
+    Trie* node = root;
+    int index = 0;
+
+    for(i = 0 ; i < len; i++)
+    {
+        index = CHAR_TO_INDEX(text[i]);
+        if(node->child[index] == NULL) {
+
+            if (node->isEndOfWord == TRUE && node->isAlreadyFound == FALSE) {
+                numOfPattern++;
+                node->isAlreadyFound = TRUE;
+            }
+
+            return;
+        }
+        else
+        {
+            if (node->isEndOfWord == TRUE && node->isAlreadyFound == FALSE) {
+                numOfPattern++;
+                node->isAlreadyFound = TRUE;
+            }
+            else
+                node = node->child[index];
+        }
+    }
+}
+
+void trieMatching(Trie* root , char* text)
+{
+  int len = strlen(text);
+  int i = 0;
+  char buf[128];
+  strcpy(buf, text);
+  for(i = 0 ; i < len ; i++)
+  {
+      prefixTrieMatching(root, buf);
+      strcpy(buf, &text[i+1]);
+  }
+}
+
+int main()
+{
+    char keys[][9] = {"par", "xyz", "paritosh"};
+    char ipstring[128] = {"parisparitoshkul"};
+    Trie* root = getNode();
+
+    for(int i = 0 ; i < 3 ;i++)
+    {
+        insert(root, keys[i]);
+    }
+
+    trieMatching(root,ipstring);
+
+    printf("Number of Patterns found: %d", numOfPattern);
+
+    return 0;
+}
+

@@ -1,0 +1,144 @@
+#include <iostream>
+#include <vector>
+#include <list>
+#include <algorithm>
+#include <string>
+#include <functional>
+
+template<typename Key>
+class hash
+{
+public:
+    size_t operator()(const Key& k)const;
+};
+
+template<>
+class hash<std::string>
+{
+public:
+
+    size_t operator()(const std::string& key) const{
+
+        size_t hashVal = 0;
+        for( char ch : key )
+            hashVal = 37 * hashVal + ch;
+        return hashVal;
+
+    }
+};
+
+
+template<typename HashObject>
+class HashTable
+{
+public:
+    explicit HashTable(size_t size = 101) {
+        mCurrentSize = 0;
+        mList.resize(size);
+    }
+
+    //size as prime number
+    bool contains(const HashObject& x) const {
+
+       int index = hashFunction(x);
+       while(mList[index] != x && mList[index] !="")
+       {
+           index =(index + 1)%mList.size();
+       }
+
+       if(mList[index] == x)
+           return true;
+
+        return false;
+    }
+
+    void makeEmpty() {
+
+        for(auto& list : mList)
+            list.clear();
+    }
+
+    bool insert(const HashObject& x){
+
+        int index = hashFunction(x);
+
+        while(mList[index] != "")
+        {
+            index = (index +1) % mList.size();
+        }
+
+        mList[index] = x;
+
+        if(mCurrentSize > mList.size())
+        {
+            //Will do special rehashing just increase size and copy old items to it
+        }
+
+        return true;
+
+    }
+
+
+private:
+
+    size_t mCurrentSize = 0;
+    std::vector<HashObject> mList;
+
+    size_t hashFunction(const HashObject& x) const {
+
+        static hash<HashObject> hf;
+        return hf(x) % mList.size();
+    }
+};
+
+// Example of an Employee class
+class Employee
+{
+
+public:
+    Employee(std::string n , double s ):name(n), salary(s){}
+
+    const std::string & getName() const
+    { return name; }
+    bool operator==( const Employee & rhs ) const
+    { return getName( ) == rhs.getName(); }
+    bool operator!=(const Employee & rhs) const
+    { return !(*this == rhs); }
+
+private:
+
+    std::string name;
+    double salary;
+};
+template<>
+class hash<Employee>
+{
+public:
+    size_t operator()( const Employee & item )
+    {
+        static hash<std::string> hf;
+        return hf( item.getName( ) );
+    }
+};
+
+int main()
+{
+    HashTable<Employee> ht;
+    Employee e1 { "Paritosh", 10000000.0};
+    Employee e2 { "Paritosh", 10000000.0};
+    Employee e3 { "Adwait", 10000000.0};
+    Employee e4 { "Piyu", 10000000.0};
+
+    ht.insert(e1);
+    ht.insert(e2);
+    ht.insert(e3);
+    ht.insert(e4);
+
+    if(ht.contains(e3))
+        std::cout << "Contains";
+    else
+        std::cout << "Doesnt contains";
+
+    return 0;
+}
+

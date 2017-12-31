@@ -1,0 +1,110 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+typedef struct AdjacencyListNode
+{
+    int destination;
+    struct AdjacencyListNode* next;
+}AdjacencyListNode;
+
+typedef struct list {
+   AdjacencyListNode * head;
+}AdjacencyList;
+
+typedef struct graph
+{
+    AdjacencyList* array;
+}GRAPH;
+
+GRAPH * graph;
+int * visited;
+
+
+void print(int numOfVertices)
+{
+  for(size_t i = 0; i < numOfVertices; i++)
+  {
+    printf("Source Vertex: %d",i);
+    AdjacencyListNode* node = NULL;
+    for(node = graph->array[i].head; node!= NULL ; node = node->next)
+    {
+        printf("%d ", node->destination);
+    }
+    printf("\n");
+  }
+}
+
+void DFS(int v , AdjacencyListNode* node, int* visited)
+{
+    visited[v] = true;
+    AdjacencyListNode* temp = NULL;
+    for(temp = graph->array[v].head ; temp != NULL ; temp = temp->next)
+        DFS(temp->destination, temp->next, visited);
+
+}
+
+AdjacencyListNode* getNode(int v)
+{
+    AdjacencyListNode* node =(AdjacencyListNode*) malloc(sizeof(AdjacencyListNode));
+    if(node != NULL) {
+        node->next = NULL;
+        node->destination = v;
+    }
+
+    return node;
+}
+
+void addEdge(int from, int to)
+{
+    AdjacencyListNode * temp = getNode(to);
+
+    if(graph->array[from].head == NULL)
+    {
+        graph->array[from].head = temp;
+    }
+    else
+    {
+        AdjacencyListNode* node = NULL;
+        for(node = graph->array[from].head ; node->next != NULL ; node = node->next);
+        node->next = temp;
+    }
+}
+
+void initGraph(int numOfVertices)
+{
+    graph = (GRAPH*)malloc(sizeof(GRAPH));
+    graph->array = (AdjacencyList*) malloc(sizeof(AdjacencyList)*numOfVertices);
+    visited = (int*) malloc (numOfVertices);
+    for(size_t i = 0 ; i < numOfVertices ;i++)
+    {
+        graph->array[i].head = NULL;
+        visited[i] = false;
+    }
+}
+
+void DFSx()
+{
+    for(size_t i = 0; i < 6; i++)
+    {
+        if(visited[i] == false)
+        {
+            DFS(i,graph->array[i].head,visited);
+        }
+    }
+}
+
+int main()
+{
+
+    initGraph(6);
+
+    addEdge(0,1);
+    addEdge(0,2);
+    addEdge(2,3);
+    addEdge(2,4);
+    addEdge(3,4);
+    addEdge(5,4);
+
+    print(6);
+    DFSx();
+}
